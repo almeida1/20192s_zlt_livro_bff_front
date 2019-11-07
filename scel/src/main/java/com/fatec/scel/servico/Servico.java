@@ -1,5 +1,6 @@
 package com.fatec.scel.servico;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,12 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fatec.scel.controller.LivroController;
 import com.fatec.scel.model.Livro;
 
@@ -22,6 +25,8 @@ public class Servico {
 	Logger logger = LoggerFactory.getLogger(Servico.class);
 	RestTemplate restTemplate = new RestTemplate();
 
+	
+	
 	public void updateLivro(Livro livro) {
 		logger.debug("Starting save Client!!!!");
 		restTemplate.put("https://app-scel1.herokuapp.com/api/livros", livro, Livro.class);
@@ -69,7 +74,7 @@ public class Servico {
 	}
 	public ResponseEntity<Livro> save(Livro livro) {
 		logger.info("chamou metodo save do servico");
-		String url = "https://app-scel1.herokuapp.com/api/livros/";
+		String url = "https://app-scel1.herokuapp.com/api/livros";
 		
 		// create headers
 				HttpHeaders headers = new HttpHeaders();
@@ -84,11 +89,22 @@ public class Servico {
 				map.put("isbn", livro.getIsbn());
 				map.put("titulo", livro.getTitulo());
 				map.put("autor", livro.getAutor());
-		
-				// build the request
+				ObjectMapper obj = new ObjectMapper();
+				String jsonStr=null;
+		        try {
+					// get Oraganisation object as a json string
+					jsonStr = obj.writeValueAsString(map);
+					// Displaying JSON String
+					System.out.println(jsonStr);
+				} catch (IOException e) {
+					e.printStackTrace(); 
+				}
+		     // build the request
 				HttpEntity<Map<String, Object>> entity = new HttpEntity<>(map, headers);
+				// build the request
+		       // HttpEntity<Livro> entity = new HttpEntity<Livro>();
 				//postForEntity(): It creates news resource using HTTP POST method to the given URI template. It returns ResponseEntity.
-				ResponseEntity<Livro> responseEntity = restTemplate.postForEntity(url, entity,Livro.class);
+				ResponseEntity<Livro> responseEntity = restTemplate.postForEntity(url, jsonStr,Livro.class);
 		
 		logger.info("novo recurso criado");
 		//return responseEntity.getBody();
