@@ -22,17 +22,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fatec.scel.model.Livro;
+import com.fatec.scel.servico.Servico;
 
 @RestController
 @RequestMapping(path = "/livros")
 public class LivroController {
 
 	private static final Logger logger = LoggerFactory.getLogger(LivroController.class);
+	@Autowired
+	Servico servico;
 
 	/**
 	 * quando o usuario digita localhost:8080/livros/cadastrar
@@ -58,16 +62,16 @@ public class LivroController {
 		}
 		try {
 			Livro jaExiste=null;
-			//jaExiste = repository.findByIsbn(livro.getIsbn());
+			jaExiste = servico.consultaPorISBN(livro.getIsbn());
 			if (jaExiste == null) {
-				//repository.save(livro);
+				servico.save(livro);
 				mv.addObject("success","Livro cadastrado com sucesso"); //quando success nao eh nulo
 				return mv;
 			} else {
 				mv.addObject("fail","Livro já cadastrado."); //quando fail nao eh nulo a msg aparece na tela
 				return mv;
 			}
-		} catch (Exception e) {
+		} catch (RestClientException e) {
 			mv.addObject("fail","erro ===> " +e.getMessage());
 			return mv; 
 		}

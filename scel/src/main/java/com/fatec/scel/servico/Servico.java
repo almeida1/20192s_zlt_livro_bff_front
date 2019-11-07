@@ -19,7 +19,7 @@ import com.fatec.scel.model.Livro;
 
 @Service
 public class Servico {
-	private static final Logger logger = LoggerFactory.getLogger(Servico.class);
+	Logger logger = LoggerFactory.getLogger(Servico.class);
 	RestTemplate restTemplate = new RestTemplate();
 
 	public void updateLivro(Livro livro) {
@@ -34,7 +34,7 @@ public class Servico {
 		return responseEntity.getBody();
 	}
 
-	public Livro save() {
+	public Livro save1() {
 		logger.debug("Starting save Client!!!!");
 		RestTemplate restTemplate = new RestTemplate();
 		String url = "https://app-scel1.herokuapp.com/api/livros/";
@@ -66,5 +66,33 @@ public class Servico {
 			return null;
 		}
 
+	}
+	public ResponseEntity<Livro> save(Livro livro) {
+		logger.info("chamou metodo save do servico");
+		String url = "https://app-scel1.herokuapp.com/api/livros/";
+		
+		// create headers
+				HttpHeaders headers = new HttpHeaders();
+				// set `content-type` header
+				headers.setContentType(MediaType.APPLICATION_JSON);
+				// set `accept` header
+				headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				
+		// create a map for post parameters
+				
+				Map<String, Object> map = new HashMap<>();
+				map.put("isbn", livro.getIsbn());
+				map.put("titulo", livro.getTitulo());
+				map.put("autor", livro.getAutor());
+		
+				// build the request
+				HttpEntity<Map<String, Object>> entity = new HttpEntity<>(map, headers);
+				//postForEntity(): It creates news resource using HTTP POST method to the given URI template. It returns ResponseEntity.
+				ResponseEntity<Livro> responseEntity = restTemplate.postForEntity(url, entity,Livro.class);
+		
+		logger.info("novo recurso criado");
+		//return responseEntity.getBody();
+		
+		return responseEntity;
 	}
 }

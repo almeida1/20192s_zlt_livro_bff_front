@@ -21,8 +21,7 @@ import com.fatec.scel.servico.Servico;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class REQ05AtualizaLivro {
-    @Autowired
-	LivroController livroController;
+    
 	@Autowired
 	Servico servico;
 
@@ -35,5 +34,15 @@ class REQ05AtualizaLivro {
 		Livro ro = servico.consultaPorISBN(livro.getIsbn());
 		assertThat(ro.getTitulo(), equalTo("Nova Engenharia de Software"));
 	}
-
+	@Test
+	public void CT02CadastraLivroComSucesso() {
+		//quando
+		Livro livro = new Livro("1111","Nova Engenharia de Software","Roger Pressman");
+		ResponseEntity<Livro> re = servico.save(livro);
+		
+		System.out.println(re.getStatusCodeValue());
+		Livro ro = servico.consultaPorISBN(livro.getIsbn());
+		
+		assertThat(ro.getTitulo(), equalTo("Nova Engenharia de Software"));
+	}
 }
